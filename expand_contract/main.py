@@ -4,14 +4,13 @@
 | Description :
 | Author      : Pushpendre Rastogi
 | Created     : Wed Jan 11 19:08:18 2017 (-0500)
-| Last-Updated: Wed Jan 11 21:20:25 2017 (-0500)
+| Last-Updated: Thu Jan 12 00:56:52 2017 (-0500)
 |           By: Pushpendre Rastogi
-|     Update #: 25
+|     Update #: 35
 '''
 from distance_computer import l2distance
 from schedule import Schedule
 import numpy as np
-from fast_count import count_mat_gt_radii
 
 
 def expand_contract_and_count(seed, point, D=None, sched=None):
@@ -19,10 +18,19 @@ def expand_contract_and_count(seed, point, D=None, sched=None):
         D = l2distance(seed, point)
     if sched is None:
         sched = Schedule(auto_config=D)
-    ret = np.zeros((point.shape[0], len(sched)), dtype='uint16')
-    count_mat_gt_radii(D, np.array(list(sched)), ret)
+    # APPROACH 1
+    # ret = np.zeros((point.shape[0], len(sched)), dtype='uint16')
+    # from fast_count import count_mat_gt_radii
+    # count_mat_gt_radii(D, np.array(list(sched)), ret)
+
+    # APPROACH 2
+    # ret = np.zeros((point.shape[0], len(sched)), dtype='uint16')
     # for idx, radius in enumerate(sched):
     #     ret[:, idx] = (D > radius).sum(axis=0)
+
+    # APPROACH 3
+    from fast_count import layercake
+    ret = layercake(D, sched)
     return ret
 
 
