@@ -28,6 +28,6 @@ if __name__ == '__main__':
     seed = np.random.rand(1000, 100).astype('float32')
     point = np.random.rand(300000, 100).astype('float32')
     D = l2distance(seed, point)
-    sched = Schedule(auto_config=D, length=100)
-    ret = expand_contract_and_count(seed, point)
+    sched = Schedule(length=100, auto_config=D)
+    ret = expand_contract_and_count(seed, point, sched=sched, D=D)
     print ret.shape, ret
