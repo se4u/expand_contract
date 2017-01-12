@@ -1,0 +1,68 @@
+\documentclass[14pt]{article}
+% ------ removeindent -------- %
+\usepackage{parskip,listings}
+\setlength\parindent{0pt}
+% -------------- ams ------------------- %
+\usepackage{amssymb,amsmath,amsthm,mathtools,graphicx,url,xspace,booktabs,microtype,breakcites}
+\newcommand{\union}{\cup}
+\renewcommand{\th}[1]{$#1^{\textrm{th}}$}
+\newcommand{\td}[0]{\tilde{d}}
+\title{Expand Contract Notation}
+\author{PR}
+
+\begin{document}
+\maketitle
+
+\section{Notation}
+\label{sec:notation}
+
+
+Let $\mathcal{S}$ be the set of all seeds and let $\mathrm{S}$ be the
+number of seeds. We index the seeds using $i$. Let $\mathcal{P}$ be the
+set of all points and $\mathrm{P}$ be the number of points. We index the
+points using $j$. Let $d_{ij}$ be the distance of the \th{i} seed from the
+\th{j} point. Let $s_i$ and $p_j$ be elements of $\mathbb{R}^d$.
+Let $r_k$ be the \th{k} radius value from a length $\mathrm{K}$ series.
+Let $c_{jk}$ be the number of seeds $s_i$ such that $d_{ij} < r_k$.
+Let $D \in \mathbb{R}^{\mathrm{S} \times \mathrm{P}}$ and
+$C \in \mathbb{N}^{\mathrm{P} \times \mathrm{K}}$ be matrices that contain $d_{jk}$
+and $c_{jk}$ respectively.
+
+Let $\td$ be the sequence of all unique $d_{ij}$ values sorted in descending order,
+such that $\td_{k} > \td_{k+1}$. We will typically let $r_k = \td_{k}$.
+
+We want to compute the matrix $C$ efficiently, the naive method for computing $C$ will
+be as follows:
+\begin{lstlisting}
+  for k, r_k in enumerate(r_tilde):
+      C[:, k] = (D > r_k).sum(axis=0)
+\end{lstlisting}
+However the above method has complexity $O(KSP)$.
+Instead of using this method we want to reduce the complexity to a lower order.
+\subsection{Fast Computation of $C$}
+\label{ssec:fast}
+Let $m_{ij}$ be the index such that $d_{ij} \ge r_{m_{ij}}$ and $d_{ij} < r_{m_{ij} + 1}$.
+and let $M \in \mathbb{N}^{\mathrm{S} \times \mathrm{P}}$ be the matrix that contains
+$m_{ij}$. This matrix can be computed in time $O(SP\log(K))$.
+Then $c_{jk} = \sum_i {[m_{ij} > k]}$.
+\footnote{The $[.]$ notation is the Iverson bracket.}
+Let $\tilde{m}_j = \textrm{sort}(m_{ij})$. Computing $\tilde{m}_j$ only takes
+$O(S\log(S))$ computations and the values of $c_{j\tilde{m}_{jk}}$ to $c_{j\tilde{m}_{j{(k+1)}}}$ are the same and they equal $k$. So $\tilde{m}_j$ is a compressed representation
+of the \th{j} row of $C$.
+
+
+
+
+
+
+
+\bibliographystyle{plain}
+\bibliography{references.bib}
+
+\end{document}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
