@@ -1,64 +1,103 @@
 \documentclass[14pt]{article}
 % ------ removeindent -------- %
-\usepackage{parskip,listings}
+\usepackage{parskip}
 \setlength\parindent{0pt}
 % -------------- ams ------------------- %
 \usepackage{amssymb,amsmath,amsthm,mathtools,graphicx,url,xspace,booktabs,microtype,breakcites}
 \newcommand{\union}{\cup}
 \renewcommand{\th}[1]{$#1^{\textrm{th}}$}
-\newcommand{\td}[0]{\tilde{d}}
-\title{Expand Contract Notation}
-\author{PR}
+\newcommand{\tr}[0]{\tilde{r}}
+\newcommand{\tk}[0]{\tilde{k}}
+\newcommand{\tM}[0]{\tilde{M}}
+\newcommand{\tm}[0]{\tilde{m}}
+\newcommand{\rmP}[0]{\mathrm{P}}
+\newcommand{\rmK}[0]{\mathrm{K}}
+\newcommand{\rmS}[0]{\mathrm{S}}
+\title{\vspace{-6em}Expand Contract Notation}
+\author{}
+\date{}
+% ------------------ listings ---------------------- %
+\usepackage[]{listings}
+\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{9} % for bold
+\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{9}  % for normal
+% Defining colors
+\usepackage{color}
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+% Python style for highlighting
+\newcommand\pythonstyle{\lstset{
+    language=Python,
+    backgroundcolor=\color{white}
+    basicstyle=\ttm,
+    otherkeywords={self},
+    keywordstyle=\ttb\color{deepblue},
+    emph={MyClass,__init__},
+    emphstyle=\ttb\color{deepred},
+    stringstyle=\color{deepgreen},
+    commentstyle=\color{red},
+    frame=tb,
+    showstringspaces=false
+  }}
 
+% Python environment
+\lstnewenvironment{python}[1][]
+{
+  \pythonstyle
+  \lstset{#1}
+}
+{}
 \begin{document}
 \maketitle
+Let $\mathcal{P}$ be the set of all points and $\rmP$ be its cardinality.
+Let $\mathcal{S}$ be the set of all seeds.
+Let $\rmS$ be the size of $\mathcal{S}$.
+We will use  $i$ to index the points and $j$ to index the seeds.
+Let $d_{ij}$ be the distance of point $p_i \in \mathbb{R}^d$ from
+seed $s_j \in \mathbb{R}^d$.
+Let $\tr$ be the sequence of unique $d_{ij}$ values of length $\rmK$.
+Let $r_k$ be the \th{k} radius value in $\tr$. We assume that $\tr$
+is sorted in ascending order, i.e. $\tr_1 < \tr_2 < \ldots < \tr_{\rmK}$.\footnote{$\tr$ does not contain duplicates therefore it can be sorted into a strictly increasing sequence.}
+Define $c_{ik}$ to be the number of seeds $s_j$, such that $d_{ij} \le r_k$.
+Let $D \in \mathbb{R}^{\rmP \times \rmS}$ and
+$C \in \mathbb{N}^{\rmP \times \rmK}$ be matrices containing
+$d_{ij}$ and $c_{ik}$ respectively.
 
-\section{Notation}
-\label{sec:notation}
-
-
-Let $\mathcal{S}$ be the set of all seeds and let $\mathrm{S}$ be the
-number of seeds. We index the seeds using $i$. Let $\mathcal{P}$ be the
-set of all points and $\mathrm{P}$ be the number of points. We index the
-points using $j$. Let $d_{ij}$ be the distance of the \th{i} seed from the
-\th{j} point. Let $s_i$ and $p_j$ be elements of $\mathbb{R}^d$.
-Let $r_k$ be the \th{k} radius value from a length $\mathrm{K}$ series.
-Let $c_{jk}$ be the number of seeds $s_i$ such that $d_{ij} < r_k$.
-Let $D \in \mathbb{R}^{\mathrm{S} \times \mathrm{P}}$ and
-$C \in \mathbb{N}^{\mathrm{P} \times \mathrm{K}}$ be matrices that contain $d_{jk}$
-and $c_{jk}$ respectively.
-
-Let $\td$ be the sequence of all unique $d_{ij}$ values sorted in descending order,
-such that $\td_{k} > \td_{k+1}$. We will typically let $r_k = \td_{k}$.
-
-We want to compute the matrix $C$ efficiently, the naive method for computing $C$ will
-be as follows:
-\begin{lstlisting}
+\paragraph{Naive Method:}
+Our goal is to compute $C$ efficiently; the following naive method
+for computing $C$ performs $O(\rmK\rmS\rmP)$ operations.
+\begin{python}
   for k, r_k in enumerate(r_tilde):
-      C[:, k] = (D > r_k).sum(axis=0)
-\end{lstlisting}
-However the above method has complexity $O(KSP)$.
-Instead of using this method we want to reduce the complexity to a lower order.
-\subsection{Fast Computation of $C$}
-\label{ssec:fast}
-Let $m_{ij}$ be the index such that $d_{ij} \ge r_{m_{ij}}$ and $d_{ij} < r_{m_{ij} + 1}$.
-and let $M \in \mathbb{N}^{\mathrm{S} \times \mathrm{P}}$ be the matrix that contains
-$m_{ij}$. This matrix can be computed in time $O(SP\log(K))$.
-Then $c_{jk} = \sum_i {[m_{ij} > k]}$.
-\footnote{The $[.]$ notation is the Iverson bracket.}
-Let $\tilde{m}_j = \textrm{sort}(m_{ij})$. Computing $\tilde{m}_j$ only takes
-$O(S\log(S))$ computations and the values of $c_{j\tilde{m}_{jk}}$ to $c_{j\tilde{m}_{j{(k+1)}}}$ are the same and they equal $k$. So $\tilde{m}_j$ is a compressed representation
-of the \th{j} row of $C$.
+      C[:, k] = (D > r_k).sum(axis=1)
+\end{python}
+Since $\rmK$ can be equal to $\mathrm{SP}$ therefore this method is impractical.
 
+\paragraph{Fast Computation of $C$}
+Let $m_{ij}$ be the index such that $d_{ij} > r_{m_{ij}}$ and $d_{ij} \le r_{m_{ij} + 1}$.
+By construction, seed $j$ will contribute a value of 1 to $c_{ik}$ for all
+$r_k \ge r_{m_{ij}}$, i.e. $c_{ik}  = \sum_{j \in \{1, \ldots, \rmP\}} \mathbb{I}[m_{ij} \le k]$. Clearly, when $k=\rmK$ then $c_{ik} = \rmS$.
 
+Define $M \in \mathbb{N}^{\rmP \times \rmS}$ to be the matrix that contains
+$m_{ij}$. This matrix can be computed in time $O(\rmS\rmP\log(\rmK))$ which is efficient even if $\rmK = \rmS \rmP$. After computing $M$ we can sort each
+row of $M$ in the ascending order using $O(\rmP\rmS\log(\rmS))$
+operations to create the matrix $\tM$.
+$\tM$ is a compressed version of $C$. For example, if $k < \tm_{i1}$
+then $c_{ik}$ equals $0$, or if $k \ge \tm_{i\rmS}$ then $c_{ik}$ equals
+$\rmS$. Finally, if $\tm_{ij} \le k < \tm_{i (j+1)}$ then $c_{ik} = j$, therefore
+$c_{ik}$ can be computed using a binary search on the rows of $\tM$.
 
+\paragraph{Inflation Ranking}
+The Inflation Ranking uses the following decision function:
+$p_{i} > p_{i'}$ if there exists $k$ such that $c_{ik} > c_{i'k}$ and
+$c_{i\tk} = c_{i'\tk}\ \forall \tk < k$. Assuming access to $\tM$ this
+decision function can be computed efficiently by comparing the prefixes of
+the sequences $\tm_{i:}$ and $\tm_{i':}$ and by finding the first prefix where
+the two sequences differ. Let $j$ be the first index starting from $1$ such
+that $\tm_{ij} \ne \tm_{i'j}$. If $\tm_{ij} > \tm_{i'j}$ then $p_{i} < p_{i'}$
+otherwise $p_i > p_{i'}$.
 
-
-
-
-\bibliographystyle{plain}
-\bibliography{references.bib}
-
+% \bibliographystyle{plain}
+% \bibliography{references.bib}
 \end{document}
 
 
