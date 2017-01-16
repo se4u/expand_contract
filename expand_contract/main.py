@@ -4,16 +4,16 @@
 | Description :
 | Author      : Pushpendre Rastogi
 | Created     : Wed Jan 11 19:08:18 2017 (-0500)
-| Last-Updated: Mon Jan 16 03:23:48 2017 (-0500)
+| Last-Updated: Mon Jan 16 03:36:19 2017 (-0500)
 |           By: Pushpendre Rastogi
-|     Update #: 52
+|     Update #: 59
 '''
 from distance_computer import l2distance
 from schedule import Schedule
 import numpy as np
-import itertools
 import contextlib
 import time
+
 
 @contextlib.contextmanager
 def tictoc(msg):
@@ -45,9 +45,19 @@ def inflation_ranking(seed, point, sched, D):
 
 
 if __name__ == '__main__':
-    seed = np.random.rand(1000, 100)
-    point = np.random.rand(30000, 100)
+    import argparse
+    arg_parser = argparse.ArgumentParser(description='')
+    arg_parser.add_argument('--seed', default=0, type=int, help='Default={0}')
+    arg_parser.add_argument('--S', default=1000, type=int)
+    arg_parser.add_argument('--P', default=30, type=int)
+    arg_parser.add_argument('--D', default=100, type=int)
+    args=arg_parser.parse_args()
+    import random
+    random.seed(args.seed)
+    np.random.seed(args.seed)
+    point = np.random.rand(args.P, args.D)
+    seed = np.random.rand(args.S, args.D)
     D = l2distance(point, seed)
     sched = Schedule(auto_config=D, keep_all=True)
     ranking = inflation_ranking(seed, point, sched, D)
-    print 'Finished ranking points'
+    print 'Finished ranking points', ranking
