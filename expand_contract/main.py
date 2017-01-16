@@ -4,32 +4,27 @@
 | Description :
 | Author      : Pushpendre Rastogi
 | Created     : Wed Jan 11 19:08:18 2017 (-0500)
-| Last-Updated: Mon Jan 16 03:18:42 2017 (-0500)
+| Last-Updated: Mon Jan 16 03:23:48 2017 (-0500)
 |           By: Pushpendre Rastogi
-|     Update #: 50
+|     Update #: 52
 '''
 from distance_computer import l2distance
 from schedule import Schedule
 import numpy as np
 import itertools
-from rasengan import tictoc
+import contextlib
+import time
 
-def expand_contract_and_count(seed, point, sched, D):
-    # APPROACH 1
-    # ret = np.zeros((point.shape[0], len(sched)), dtype='uint16')
-    # from fast_count import count_mat_gt_radii
-    # count_mat_gt_radii(D, np.array(list(sched)), ret)
+@contextlib.contextmanager
+def tictoc(msg):
+    t = time.time()
+    print "Started", msg
+    yield
+    print "\nCompleted", msg, "in %0.1fs" % (time.time() - t)
 
-    # APPROACH 2
-    # ret = np.zeros((point.shape[0], len(sched)), dtype='uint16')
-    # for idx, radius in enumerate(sched):
-    #     ret[:, idx] = (D > radius).sum(axis=0)
 
-    # APPROACH 3
-    # from fast_count import layercake
-    # ret = layercake(D, sched)
 
-    # Approach 4
+def inflation_ranking(seed, point, sched, D):
     with tictoc('Step 1'):
         M_tilde = np.searchsorted(sched, D)
     with tictoc('Step 2'):
@@ -54,4 +49,5 @@ if __name__ == '__main__':
     point = np.random.rand(30000, 100)
     D = l2distance(point, seed)
     sched = Schedule(auto_config=D, keep_all=True)
-    ret = expand_contract_and_count(seed, point, sched, D)
+    ranking = inflation_ranking(seed, point, sched, D)
+    print 'Finished ranking points'
