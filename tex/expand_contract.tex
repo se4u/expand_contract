@@ -13,7 +13,9 @@
 \newcommand{\rmP}[0]{\mathrm{P}}
 \newcommand{\rmK}[0]{\mathrm{K}}
 \newcommand{\rmS}[0]{\mathrm{S}}
-\title{\vspace{-6em}Expand Contract Notation}
+\newcommand{\tI}[0]{\tilde{I}}
+\newcommand{\ti}[0]{\tilde{i}}
+\title{\vspace{-6em}Efficient Seeded Inflation Ranking\vspace{-3em}}
 \author{}
 \date{}
 % ------------------ listings ---------------------- %
@@ -96,6 +98,16 @@ the two sequences differ. Let $j$ be the first index starting from $1$ such
 that $\tm_{ij} \ne \tm_{i'j}$. If $\tm_{ij} > \tm_{i'j}$ then $p_{i} < p_{i'}$
 otherwise $p_i > p_{i'}$.
 
+\paragraph{Inflation Ranking with Binary Labeled Seeds}
+In the previous section, we assumed that seed $j$ will contribute a value of 1 to
+$c_{ik}$. We now relax that assumption and instead assume that seed $s_j$
+contributes a value of $l_j$ to $c_{ik}$. We assume that $l_j$ is either $-1$,
+or $1$. Therefore $c_{ik} = \sum_{j \in \{1, \ldots, \rmP\}}l_j\mathbb{I}[m_{ij} \le k]$.
+Let $\ti_{ij}$ equal the index of the seed corresponding to $\tm_{ij}$.
+If $\tm_{i'j} < \tm_{ij}$ and $l_{\ti_{i'j}} = -1$ then $p_i > p_{i'}$, but
+if $\tm_{i'j} < \tm_{ij}$ and $l_{\ti_{i'j}} = 1$ then $p_i < p_{i'}$.
+On the other hand, if $\tm_{i'j} > \tm_{ij}$ then $p_i > p_{i'}$ if $l_{\ti_{ij}} = 1$ and vice versa. Finally, if $\tm_{i'j} = \tm_{ij}$ and $l_{\ti_{ij}} \ne l_{\ti_{i'j}}$ then
+$p_i > p_{i'}$ if $l_{\ti_{ij}} > l_{\ti_{i'j}}$ and vice versa.
 % \bibliographystyle{plain}
 % \bibliography{references.bib}
 \end{document}
