@@ -4,9 +4,9 @@
 | Description :
 | Author      : Pushpendre Rastogi
 | Created     : Wed Jan 11 19:08:18 2017 (-0500)
-| Last-Updated: Wed Jan 18 15:41:15 2017 (-0500)
+| Last-Updated: Wed Jan 18 15:56:38 2017 (-0500)
 |           By: Pushpendre Rastogi
-|     Update #: 105
+|     Update #: 108
 '''
 from distance_computer import l2distance
 from schedule import Schedule
@@ -35,6 +35,10 @@ def inflation_ranking(sched, D, seed_labels):
     assert np.all(D >= 0)
     with tictoc('Step 1'):
         M = np.searchsorted(sched, D)
+        # Potentially paralle code.
+        # from joblib import Parallel, delayed
+        # Parallel(n_jobs=10)(delayed(np.searchsorted)(sched, D[i])
+        #                     for i in range(D.shape[0]))
     with tictoc('Step 2'):
         # NOTE: use mergesort since it is a stable sort in numpy.
         # docs.scipy.org/doc/numpy/reference/generated/numpy.sort.html
@@ -86,12 +90,12 @@ def test1(args):
 
 def test2(*args):
     sched = np.array([-1, 1, 5, 9])
-    D = np.array([[1, 1, 1, 1],
-                  [5, 5, 1, 9],
-                  [9, 1, 5, 5],
-                  [5, 5, 9, 1],
-                  [1, 9, 5, 5]], dtype='double')
-    seed_labels = np.array([1, 1, -1, -1])
+    D = np.array([[1, 1,1,  1],
+                  [5, 1,5,  9],
+                  [9, 5,1,  5],
+                  [5, 9,5,  1],
+                  [1, 5,9,  5]], dtype='double')
+    seed_labels = np.array([1, -1, 1, -1])
     return sched, D, seed_labels
 
 if __name__ == '__main__':
@@ -99,7 +103,7 @@ if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser(description='')
     arg_parser.add_argument('--seed', default=0, type=int, help='Default={0}')
     arg_parser.add_argument('--S', default=1000, type=int)
-    arg_parser.add_argument('--P', default=30, type=int)
+    arg_parser.add_argument('--P', default=3000, type=int)
     arg_parser.add_argument('--D', default=100, type=int)
     args=arg_parser.parse_args()
     import random
