@@ -29,21 +29,27 @@ def arrange_by_index(M, I):
         M2[i] = M[i][I[i]]
     return M2
 
-def inflation_ranking(seed, point, sched, D, seed_labels):
+def inflation_ranking(sched, D, seed_labels):
+    assert all(e in [-1, 1] for e in seed_labels)
+    assert sched[0] < 0
     with tictoc('Step 1'):
         M = np.searchsorted(sched, D)
     with tictoc('Step 2'):
-        I_tilde = np.argsort(M, axis=1)
+        # NOTE: use mergesort since it is a stable sort in numpy.
+        # docs.scipy.org/doc/numpy/reference/generated/numpy.sort.html
+        I_tilde = np.argsort(M, axis=1, kind='mergesort')
         M_tilde = arrange_by_index(M, I_tilde)
-    assert M_tilde[0, 0] < M_tilde[0, 1]
-    assert all(e in [-1, 1] for e in seed_labels)
+        G_tilde = (np.diff(M_tilde, axis=1)==0)
+    assert M_tilde[0, 0] <= M_tilde[0, 1]
     def cmp_fnc(i, ip):
         for j in xrange(M_tilde.shape[1]):
             mij, mipj = M_tilde[i,j], M_tilde[ip, j]
             if mipj < mij:
-                return (1 if seed_labels[I_tilde[ip, j]] == -1 else -1)
+                nbr_influence = seed_labels[I_tilde[ip, j]]
+                return (1 if nbr_influence < 0 else -1)
             elif mipj > mij:
-                return (1 if seed_labels[I_tilde[i, j]] == 1 else -1)
+                nbr_influence = seed_labels[I_tilde[i, j]]
+                return (1 if nbr_influence > 0 else -1)
             elif mij == mipj:
                 lij = seed_labels[I_tilde[i, j]]
                 lipj = seed_labels[I_tilde[ip, j]]
@@ -54,6 +60,24 @@ def inflation_ranking(seed, point, sched, D, seed_labels):
         ranking = sorted(xrange(D.shape[0]), cmp=cmp_fnc)
     return ranking
 
+
+def test1(args):
+    point = np.random.rand(args.P, args.D)
+    seed = np.random.rand(args.S, args.D)
+    seed_labels = (np.rint(np.random.rand(args.S)) - 0.5)*2
+    D = l2distance(point, seed)
+    sched = Schedule(auto_config=D, keep_all=True)
+    return sched, D, seed_labels
+
+def test2(_):
+    sched = np.array([-1, 1, 5, 9])
+    D = np.array([[1, 1, 1, 1],
+                  [5, 5, 1, 9],
+                  [9, 1, 5, 5],
+                  [5, 5, 9, 1],
+                  [1, 9, 5, 5]], dtype='double')
+    seed_labels = np.array([1, 1, -1, -1])
+    return sched, D, seed_labels
 
 if __name__ == '__main__':
     import argparse
@@ -66,11 +90,6 @@ if __name__ == '__main__':
     import random
     random.seed(args.seed)
     np.random.seed(args.seed)
-    point = np.random.rand(args.P, args.D)
-    seed = np.random.rand(args.S, args.D)
-    seed_labels = (np.rint(np.random.rand(args.S)) - 0.5)*2
-    # seed_labels = np.ones(args.S)
-    D = l2distance(point, seed)
-    sched = Schedule(auto_config=D, keep_all=True)
-    ranking = inflation_ranking(seed, point, sched, D, seed_labels)
-    print 'Finished ranking points', ranking
+    ranking = inflation_ranking(*test2())
+    true_ranking = '(13/31)(0)(24/42)'
+    print 'Finished ranking points', ranking, true_ranking
