@@ -4,9 +4,9 @@
 | Description :
 | Author      : Pushpendre Rastogi
 | Created     : Wed Jan 11 19:08:18 2017 (-0500)
-| Last-Updated: Wed Jan 18 15:33:13 2017 (-0500)
+| Last-Updated: Wed Jan 18 15:41:15 2017 (-0500)
 |           By: Pushpendre Rastogi
-|     Update #: 102
+|     Update #: 105
 '''
 from distance_computer import l2distance
 from schedule import Schedule
@@ -71,7 +71,6 @@ def inflation_ranking(sched, D, seed_labels):
                 if i_nbr_influence != ip_nbr_influence:
                     return (1 if i_nbr_influence > ip_nbr_influence else -1)
         return 0
-    assert cmp_fnc(0, 2) == -1
     with tictoc('Step 3'):
         ranking = sorted(xrange(D.shape[0]), cmp=cmp_fnc)
     return ranking
@@ -106,6 +105,7 @@ if __name__ == '__main__':
     import random
     random.seed(args.seed)
     np.random.seed(args.seed)
-    ranking = inflation_ranking(*test2())
-    true_ranking = '(13/31)(0)(24/42)'
-    print 'Finished ranking points', ranking, true_ranking
+    ranking = inflation_ranking(*test1(args))
+    print 'Finished ranking points', ranking,
+    ranking = inflation_ranking(*test2(args))
+    print 'Finished ranking points', ranking, '(13/31)(0)(24/42)'
