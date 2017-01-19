@@ -1,0 +1,66 @@
+\documentclass[xcolor=dvipsnames]{beamer}
+\usepackage{graphicx,url}
+\renewcommand{\S}[0]{\mathrm{S}}
+\renewcommand{\P}[0]{\mathrm{P}}
+% example themes
+%\usetheme{Frankfurt}
+%\usecolortheme{seahorse}
+%\usecolortheme{rose}
+
+% put page numbers
+% \setbeamertemplate{footline}[frame number]{}
+\setbeamertemplate{frametitle}[default][center]
+% remove navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+\title{Seeded Inflation Ranking}
+\author{}
+\begin{document}
+% \frame[plain]{\titlepage}
+% \begin{frame}[plain]{Outline}
+%   \tableofcontents
+% \end{frame}
+\begin{frame}{The Inflation Ranking Method}
+  \begin{table}[htbp]
+    \centering
+    \begin{tabular}{l|l}
+      \textbf{Given} & A set of points $\{p_i | i \in [1, \ldots, \mathrm{P}]\}$ \\
+            & A set of seeds $\{s_j | j \in [1, \ldots, \mathrm{S}]\}$   \\
+      \end{tabular}
+  \end{table}
+
+  \pause
+\begin{table}[htbp]
+  \centering
+  \begin{tabular}{r|l}%\toprule
+    \multicolumn{2}{ c }{\textit{A Few Definitions}}\\\hline
+    $d_{ij}$ &  Distance of point $p_i \in \mathbb{R}^d$ from seed $s_j \in \mathbb{R}^d$\\
+    $l_j$ & Signed, weighted label of $s_j$\\
+    $c_{i}(r)$ & $\underset{j | d_{ij} < r}{\sum} l_j$, Sum of labels of seeds
+                 within distance $r$\\
+    \end{tabular}
+  \end{table}
+\pause
+  \textbf{The Inflation Ranking Rule}:  $p_{i} > p_{i'}$ if there exists $r_0$ such that
+  $c_{i}(r_0) > c_{i'}(r_0)$ and $c_{i}(r) = c_{i'}(r)\ \forall r < r_0$.
+\pause
+  \begin{table}[htbp]
+    \centering
+    \begin{tabular}{r|lr}
+      \multicolumn{2}{c}{\textit{A Few Properties}}&\\\hline
+      Total Ordering & Trivial &\\
+      Transitive & Proved &{\textbf{(MiniScale 2017)}} \\
+      Efficient & $O(\S\P\log(\S\P))$ &\textbf{(MiniScale 2017)}\\
+      Evaluation & \textit{Next Slide} & \textbf{(MiniScale 2017)}\\
+      \end{tabular}
+  \end{table}
+
+\end{frame}
+
+\end{document}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
