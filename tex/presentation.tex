@@ -32,12 +32,12 @@
   \pause
 \begin{table}[htbp]
   \centering
-  \begin{tabular}{r|l}%\toprule
-    \multicolumn{2}{ c }{\textit{A Few Definitions}}\\\hline
+  \begin{tabular}{|r|l|}%\toprule
+    \multicolumn{2}{ c }{\textit{Some Definitions}}\\\hline
     $d_{ij}$ &  Distance of point $p_i \in \mathbb{R}^d$ from seed $s_j \in \mathbb{R}^d$\\
     $l_j$ & Signed, weighted label of $s_j$\\
-    $c_{i}(r)$ & $\underset{j | d_{ij} < r}{\sum} l_j$, Sum of labels of seeds
-                 within distance $r$\\
+    $c_{i}(r) = \underset{j | d_{ij} < r}{\sum} l_j$ & Sum of labels of seeds
+                 within distance $r$\\\hline
     \end{tabular}
   \end{table}
 \pause
@@ -46,12 +46,12 @@
 \pause
   \begin{table}[htbp]
     \centering
-    \begin{tabular}{r|lr}
-      \multicolumn{2}{c}{\textit{A Few Properties}}&\\\hline
+    \begin{tabular}{|r|lr|}
+      \multicolumn{2}{c}{\textit{Properties}}&\multicolumn{1}{c}{}\\\hline
       Total Ordering & Trivial &\\
       Transitive & Proved &{\textbf{(MiniScale 2017)}} \\
       Efficient & $O(\S\P\log(\S\P))$ &\textbf{(MiniScale 2017)}\\
-      Evaluation & \textit{Next Slide} & \textbf{(MiniScale 2017)}\\
+      Evaluation & \textit{Next Slide} & \textbf{(MiniScale 2017)}\\\hline
       \end{tabular}
   \end{table}
 
