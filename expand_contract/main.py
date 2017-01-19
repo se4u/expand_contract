@@ -4,9 +4,9 @@
 | Description :
 | Author      : Pushpendre Rastogi
 | Created     : Wed Jan 11 19:08:18 2017 (-0500)
-| Last-Updated: Wed Jan 18 15:56:38 2017 (-0500)
+| Last-Updated: Thu Jan 19 11:55:28 2017 (-0500)
 |           By: Pushpendre Rastogi
-|     Update #: 108
+|     Update #: 118
 '''
 from distance_computer import l2distance
 from schedule import Schedule
@@ -44,19 +44,25 @@ def inflation_ranking(sched, D, seed_labels):
         # docs.scipy.org/doc/numpy/reference/generated/numpy.sort.html
         I_tilde = np.argsort(M, axis=1, kind='mergesort')
         M_tilde = arrange_by_index(M, I_tilde)
+        M_tilde_max = M_tilde.max(axis=1)
+        M_tilde_min = M_tilde.min(axis=1)
         G_tilde = (np.diff(M_tilde, axis=1)==0)
-    assert M_tilde[0, 0] <= M_tilde[0, 1]
+    assert (M_tilde.shape[1] == 1) or (M_tilde[0, 0] <= M_tilde[0, 1])
     def cmp_fnc(i, ip):
         def get_nbr_influence(row_idx, j):
-            nbr_influence = seed_labels[I_tilde[row_idx, j]]
-            if j == G_tilde.shape[1]:
+            cursor = j
+            while j>0 and G_tilde[row_idx, j-1]:
+                j -= 1
+                cursor = j
+            nbr_influence = seed_labels[I_tilde[row_idx, cursor]]
+            if cursor == G_tilde.shape[1]:
                 return nbr_influence
-            while G_tilde[row_idx, j]:
-                nbr_influence +=  seed_labels[I_tilde[row_idx, j+1]]
-                if j == G_tilde.shape[1] - 1:
+            while G_tilde[row_idx, cursor]:
+                nbr_influence +=  seed_labels[I_tilde[row_idx, cursor+1]]
+                if cursor == G_tilde.shape[1] - 1:
                     break
                 else:
-                    j += 1
+                    cursor += 1
             return nbr_influence
 
         for j in xrange(M_tilde.shape[1]):
@@ -74,6 +80,14 @@ def inflation_ranking(sched, D, seed_labels):
                 ip_nbr_influence = get_nbr_influence(ip, j)
                 if i_nbr_influence != ip_nbr_influence:
                     return (1 if i_nbr_influence > ip_nbr_influence else -1)
+        # Handle the special case, that the radius of i/ip from all the
+        # seeds is lesser than the radius of ip/i
+        if (M_tilde_max[i] < M_tilde_min[ip]
+            or M_tilde_min[i] > M_tilde_max[ip]):
+            i_nbr_influence = get_nbr_influence(i, 0)
+            ip_nbr_influence = get_nbr_influence(ip, 0)
+            if i_nbr_influence != ip_nbr_influence:
+                return (1 if i_nbr_influence > ip_nbr_influence else -1)
         return 0
     with tictoc('Step 3'):
         ranking = sorted(xrange(D.shape[0]), cmp=cmp_fnc)
@@ -98,6 +112,15 @@ def test2(*args):
     seed_labels = np.array([1, -1, 1, -1])
     return sched, D, seed_labels
 
+
+def test3(_args):
+    seeds = np.array([[0, -1], [0, 1]], dtype = 'double')
+    seed_labels = np.array([1, -1])
+    pts = np.array([[0, 0], [2, 1]], dtype = 'double')
+    D = l2distance(pts, seeds)
+    sched = np.concatenate([[-1],sorted(set(D.flatten()))])
+    return  sched, D, seed_labels
+
 if __name__ == '__main__':
     import argparse
     arg_parser = argparse.ArgumentParser(description='')
@@ -109,6 +132,10 @@ if __name__ == '__main__':
     import random
     random.seed(args.seed)
     np.random.seed(args.seed)
+
+    ranking = inflation_ranking(*test3(args))
+    print 'Finished ranking points', ranking,
+
     ranking = inflation_ranking(*test1(args))
     print 'Finished ranking points', ranking,
     ranking = inflation_ranking(*test2(args))
