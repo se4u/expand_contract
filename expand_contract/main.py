@@ -4,9 +4,9 @@
 | Description :
 | Author      : Pushpendre Rastogi
 | Created     : Wed Jan 11 19:08:18 2017 (-0500)
-| Last-Updated: Thu Jan 19 11:55:28 2017 (-0500)
+| Last-Updated: Thu Jan 19 12:20:31 2017 (-0500)
 |           By: Pushpendre Rastogi
-|     Update #: 118
+|     Update #: 119
 '''
 from distance_computer import l2distance
 from schedule import Schedule
@@ -125,18 +125,16 @@ if __name__ == '__main__':
     import argparse
     arg_parser = argparse.ArgumentParser(description='')
     arg_parser.add_argument('--seed', default=0, type=int, help='Default={0}')
-    arg_parser.add_argument('--S', default=1000, type=int)
-    arg_parser.add_argument('--P', default=3000, type=int)
+    arg_parser.add_argument('--S', default=100, type=int)
+    arg_parser.add_argument('--P', default=30, type=int)
     arg_parser.add_argument('--D', default=100, type=int)
     args=arg_parser.parse_args()
     import random
     random.seed(args.seed)
     np.random.seed(args.seed)
-
-    ranking = inflation_ranking(*test3(args))
-    print 'Finished ranking points', ranking,
-
     ranking = inflation_ranking(*test1(args))
-    print 'Finished ranking points', ranking,
+    print 'Finished ranking points', ranking
     ranking = inflation_ranking(*test2(args))
     print 'Finished ranking points', ranking, '(13/31)(0)(24/42)'
+    ranking = inflation_ranking(*test3(args))
+    print 'Finished ranking points', ranking
