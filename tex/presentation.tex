@@ -7,54 +7,89 @@
 %\usecolortheme{seahorse}
 %\usecolortheme{rose}
 
+\newcommand{\st}{\, | \,}
+
+\renewcommand{\arraystretch}{1.2}
+
 % put page numbers
 % \setbeamertemplate{footline}[frame number]{}
 \setbeamertemplate{frametitle}[default][center]
 % remove navigation symbols
 \setbeamertemplate{navigation symbols}{}
 
-\title{Seeded Inflation Ranking}
-\author{}
+\title{Seeded Inflation/Deflation Ranking}
+\institute{HLTCOE Mini-SCALE}
+\author{Vince Lyzinski \\ Pushpendre Rastogi \\ Jeremy Silver}
 \begin{document}
-% \frame[plain]{\titlepage}
-% \begin{frame}[plain]{Outline}
-%   \tableofcontents
-% \end{frame}
+
+\frame[plain]{\titlepage}
+
 \begin{frame}{The Inflation Ranking Method}
+  \vspace{7pt}
   \begin{table}[htbp]
     \centering
     \begin{tabular}{l|l}
-      \textbf{Given} & A set of points $\{p_i | i \in [1, \ldots, \mathrm{P}]\}$ \\
-            & A set of seeds $\{s_j | j \in [1, \ldots, \mathrm{S}]\}$   \\
+      \textbf{Given} & A set of points $\{p_i \st i \in [1, \ldots, \mathrm{P}]\}$ \\
+            & A set of seeds $\{s_j \st j \in [1, \ldots, \mathrm{S}]\}$   \\
       \end{tabular}
   \end{table}
 
   \pause
+  \vspace{-10pt}
 \begin{table}[htbp]
   \centering
   \begin{tabular}{|r|l|}%\toprule
     \multicolumn{2}{ c }{\textit{Some Definitions}}\\\hline
     $d_{ij}$ &  Distance of point $p_i \in \mathbb{R}^d$ from seed $s_j \in \mathbb{R}^d$\\
-    $l_j$ & Signed, weighted label of $s_j$\\
-    $c_{i}(r) = \underset{j | d_{ij} < r}{\sum} l_j$ & Sum of labels of seeds
+    $\ell_j$ & Signed, weighted label of $s_j$\\
+    $c_{i}(r) = \underset{j \st d_{ij} < r}{\sum} \ell_j$ & Sum of labels of seeds
                  within distance $r$\\\hline
     \end{tabular}
   \end{table}
 \pause
   \textbf{The Inflation Ranking Rule}:  $p_{i} > p_{i'}$ if there exists $r_0$ such that
-  $c_{i}(r_0) > c_{i'}(r_0)$ and $c_{i}(r) = c_{i'}(r)\ \forall r < r_0$.
+  $c_{i}(r_0) > c_{i'}(r_0)$, and $c_{i}(r) = c_{i'}(r)$ for all $r < r_0$.
 \pause
   \begin{table}[htbp]
     \centering
-    \begin{tabular}{|r|lr|}
-      \multicolumn{2}{c}{\textit{Properties}}&\multicolumn{1}{c}{}\\\hline
-      Total Ordering & Trivial &\\
-      Transitive & Proved &{\textbf{(MiniScale 2017)}} \\
-      Efficient & $O(\S\P\log(\S\P))$ &\textbf{(MiniScale 2017)}\\
-      Evaluation & \textit{Next Slide} & \textbf{(MiniScale 2017)}\\\hline
+    \begin{tabular}{|r|l|}
+      \multicolumn{2}{c}{\textit{Properties}}\\\hline
+      Strict Weak Ordering & Proved \\
+      Efficient & $O(\S\P\log(\S\P))$ \\
+      Evaluation & \textit{See below} \\\hline
       \end{tabular}
   \end{table}
 
+\end{frame}
+
+\begin{frame}{Inflation \& Deflation Ranking: Illustrations}
+\begin{figure}
+  \makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{img/square1_balloon.png}}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Inflation \& Deflation Ranking: Illustrations}
+\begin{figure}
+  \makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{img/target_compare.png}}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Inflation \& Deflation Ranking: Illustrations}
+\begin{figure}
+  \makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{img/3-spiral_compare.png}}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Vertex Nomination Evaluation (Google+)}
+\begin{figure}
+  \makebox[\textwidth][c]{\includegraphics[width=1.1\textwidth]{img/uc_berkeley.png}}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Vertex Nomination Evaluation (Google+)}
+\begin{figure}
+  \makebox[\textwidth][c]{\includegraphics[width=1.1\textwidth]{img/new_york.png}}
+\end{figure}
 \end{frame}
 
 \end{document}
