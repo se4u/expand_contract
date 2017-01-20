@@ -42,7 +42,7 @@
     \multicolumn{2}{ c }{\textit{Some Definitions}}\\\hline
     $d_{ij}$ &  Distance of point $p_i \in \mathbb{R}^d$ from seed $s_j \in \mathbb{R}^d$\\
     $\ell_j$ & Signed, weighted label of $s_j$\\
-    $c_{i}(r) = \underset{j \st d_{ij} < r}{\sum} \ell_j$ & Sum of labels of seeds
+    $c_{i}(r) = \underset{j \st d_{ij} \le r}{\sum} \ell_j$ & Sum of labels of seeds
                  within distance $r$\\\hline
     \end{tabular}
   \end{table}
@@ -79,12 +79,23 @@
   \makebox[\textwidth][c]{\includegraphics[width=1.05\textwidth]{img/tie_r2.png}}
 \end{figure}
 \end{frame}
+\begin{frame}
+\textbf{The Inflation Ranking Rule}:  $p_{i} > p_{i'}$ if there exists $r_0$ such that
+$c_{i}(r_0) > c_{i'}(r_0)$, and $c_{i}(r) = c_{i'}(r)$ for all {\color{red}$r \mathbf{<} r_0$}
+
+\vspace{5em}
+
+\textbf{The Deflation Ranking Rule}:  $p_{i} > p_{i'}$ if there exists $r_0$ such that
+  $c_{i}(r_0) > c_{i'}(r_0)$, and $c_{i}(r) = c_{i'}(r)$ for all {\color{red}$r \mathbf{>} r_0$}
+\end{frame}
+
 
 \begin{frame}{Inflation \& Deflation Ranking in $\mathbb{R}^2$}
 \begin{figure}
   \makebox[\textwidth][c]{\includegraphics[width=1.2\textwidth]{img/square1_balloon.png}}
 \end{figure}
 \end{frame}
+
 
 \begin{frame}{Inflation \& Deflation Ranking in $\mathbb{R}^2$}
 \begin{figure}
