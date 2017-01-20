@@ -120,6 +120,30 @@ In order to efficiently do this summation we create a boolean matrix $G \in \{0,
 contains the ``Go on flag'' $g_{ij}$ corresponding to $m_{ij}$ which can be used to
 efficiently find the indices for summation.
 
+\paragraph{Probability Field Estimation}
+Consider that each seed induces a field of bernoulli distributions, and the
+field at a point is the average, potentially additionaly weighted,
+of the fields of all seeds. The seed, $s_j$ has an associated class label, $l_j$ associated
+with it. The field induced by a seed $s_j$ can be
+parameterized as $p_j(x) = f_{\theta_j}(g_{\Phi_j}(x - s_j))$. $\theta_j$ is a vector of
+parameters that parameterize $p_j$. The function $g$ may be the
+$p$-norm, $g(x) = ||x||_p$, or the identity, and $f$ may be the $\exp$
+function, or the sigmoid function, or the gaussian function. Once the values
+of $\theta_j$ have been estimated, by (regularized) maximum likelihood estimation
+then the probability at point $x$ of the random variable $R_x$ being equal to $1$ is
+$p(R_x = 1) = \frac{1}{N} \sum_{j} p_j(x)$. Note that we do not need to remove the data
+point $s_j$ itself when estimating $\theta_j$.
+
+In case the function $g$ is the identity function then this method is equivalent
+to just training a single probabilistic classifier. In case we leave out the
+data point $(s_j, l_j)$ while estimating $\theta_j$ then this is equivalent
+to calculating leave one out prediction and averaging them.
+
+In contrast, if the function $g$ is a norm function, then this method is
+significantly different. The problem with using a norm function however,
+is that it is isotropic and does not respect directionality. Therefore the
+right method will be to parameterize $g(x)=\sigmoid{\Phi{x}}$. Note that
+particular form of the function looks very much like a neural network.
 % \bibliographystyle{plain}
 % \bibliography{references.bib}
 \end{document}
