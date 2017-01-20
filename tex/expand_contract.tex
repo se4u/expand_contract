@@ -2,6 +2,10 @@
 % ------ removeindent -------- %
 \usepackage{parskip}
 \setlength\parindent{0pt}
+% ---------------- todocmd ----------------- %
+\usepackage[disable]{todonotes} % insert [disable] to disable all notes.
+\newcommand{\Todo}[1]{\todo[author=Pushpendre,size=\small,inline]{#1}}
+\newcommand{\tudu}[1][]{{\color{red}TODO #1}}
 % -------------- ams ------------------- %
 \usepackage{amssymb,amsmath,amsthm,mathtools,graphicx,url,xspace,booktabs,microtype,breakcites}
 \newcommand{\union}{\cup}
@@ -15,6 +19,7 @@
 \newcommand{\rmS}[0]{\mathrm{S}}
 \newcommand{\tI}[0]{\tilde{I}}
 \newcommand{\ti}[0]{\tilde{i}}
+
 \title{\vspace{-6em}Efficient Seeded Inflation Ranking\vspace{-3em}}
 \author{}
 \date{}
@@ -135,7 +140,7 @@ $p(R_x = 1) = \frac{1}{N} \sum_{j} p_j(x)$. Note that we do not need to remove t
 point $s_j$ itself when estimating $\theta_j$.
 
 In case the function $g$ is the identity function then this method is equivalent
-to just training a single probabilistic classifier. In case we leave out the
+to just training a single probabilistic classifier.\tudu[prove this] In case we leave out the
 data point $(s_j, l_j)$ while estimating $\theta_j$ then this is equivalent
 to calculating leave one out prediction and averaging them.
 
