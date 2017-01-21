@@ -4,9 +4,9 @@
 | Description :
 | Author      : Pushpendre Rastogi
 | Created     : Wed Jan 11 19:08:18 2017 (-0500)
-| Last-Updated: Sat Jan 21 01:42:29 2017 (-0500)
+| Last-Updated: Sat Jan 21 01:45:58 2017 (-0500)
 |           By: Pushpendre Rastogi
-|     Update #: 150
+|     Update #: 152
 '''
 from distance_computer import l2distance
 from schedule import Schedule
@@ -97,6 +97,7 @@ def inflation_ranking(sched, D, seed_labels):
                 if i_nbr_influence != ip_nbr_influence:
                     return (1 if i_nbr_influence > ip_nbr_influence else -1)
             ip_cursor, i_cursor = new_ip_cursor, new_i_cursor
+            pass # Close while loop: while min(i_cursor, ip_cursor) < S
         # Handle the special case, that the radius of i/ip from all the
         # seeds is lesser than the radius of ip/i
         if (M_tilde_max[i] < M_tilde_min[ip]
