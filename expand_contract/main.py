@@ -4,23 +4,23 @@
 | Description :
 | Author      : Pushpendre Rastogi
 | Created     : Wed Jan 11 19:08:18 2017 (-0500)
-| Last-Updated: Sat Jan 21 00:56:39 2017 (-0500)
+| Last-Updated: Sat Jan 21 01:42:29 2017 (-0500)
 |           By: Pushpendre Rastogi
-|     Update #: 127
+|     Update #: 150
 '''
 from distance_computer import l2distance
 from schedule import Schedule
 import numpy as np
 import contextlib
-import time, sys
+import time
 
 
 @contextlib.contextmanager
 def tictoc(msg):
     t = time.time()
-    print >> sys.stderr, "Started", msg
+    print "Started", msg
     yield
-    print >> sys.stderr, "\nCompleted", msg, "in %0.1fs" % (time.time() - t)
+    print "\nCompleted", msg, "in %0.1fs" % (time.time() - t)
 
 
 def arrange_by_index(M, I):
@@ -50,36 +50,53 @@ def inflation_ranking(sched, D, seed_labels):
     assert (M_tilde.shape[1] == 1) or (M_tilde[0, 0] <= M_tilde[0, 1])
     def cmp_fnc(i, ip):
         def get_nbr_influence(row_idx, j):
-            cursor = j
+            backtrack_cursor = j
             while j>0 and G_tilde[row_idx, j-1]:
                 j -= 1
-                cursor = j
-            nbr_influence = seed_labels[I_tilde[row_idx, cursor]]
-            if cursor == G_tilde.shape[1]:
+                backtrack_cursor = j
+            nbr_influence = seed_labels[I_tilde[row_idx, backtrack_cursor]]
+            if backtrack_cursor == G_tilde.shape[1]:
                 return nbr_influence
-            while G_tilde[row_idx, cursor]:
-                nbr_influence +=  seed_labels[I_tilde[row_idx, cursor+1]]
-                if cursor == G_tilde.shape[1] - 1:
+            while G_tilde[row_idx, backtrack_cursor]:
+                nbr_influence +=  seed_labels[I_tilde[row_idx, backtrack_cursor+1]]
+                if backtrack_cursor == G_tilde.shape[1] - 1:
                     break
                 else:
-                    cursor += 1
+                    backtrack_cursor += 1
             return nbr_influence
 
-        for j in xrange(M_tilde.shape[1]):
-            mij, mipj = M_tilde[i,j], M_tilde[ip, j]
+        i_cursor, ip_cursor = 0, 0
+        S = M_tilde.shape[1]
+        while min(i_cursor, ip_cursor) < S:
+            new_ip_cursor, new_i_cursor = ip_cursor, i_cursor
+            ip_id_cursor, i_id_cursor = ip_cursor, i_cursor
+            if i_cursor >= S:
+                i_id_cursor = S-1
+                new_ip_cursor = ip_cursor + 1
+            elif ip_cursor >= S:
+                ip_id_cursor = S-1
+                new_i_cursor = i_cursor + 1
+            elif M_tilde[ip, ip_cursor] >= M_tilde[i, i_cursor]:
+                new_i_cursor = i_cursor + 1
+            elif M_tilde[i, i_cursor] >= M_tilde[ip, ip_cursor]:
+                new_ip_cursor = ip_cursor + 1
+            else:
+                raise Exception("IllegalState")
+            mij, mipj = M_tilde[i,i_id_cursor], M_tilde[ip, ip_id_cursor]
             if mipj < mij:
-                nbr_influence = get_nbr_influence(ip, j)
+                nbr_influence = get_nbr_influence(ip, ip_id_cursor)
                 if nbr_influence != 0:
                     return (1 if nbr_influence < 0 else -1)
             elif mipj > mij:
-                nbr_influence = get_nbr_influence(i, j)
+                nbr_influence = get_nbr_influence(i, i_id_cursor)
                 if nbr_influence != 0:
                     return (1 if nbr_influence > 0 else -1)
             elif mij == mipj:
-                i_nbr_influence = get_nbr_influence(i, j)
-                ip_nbr_influence = get_nbr_influence(ip, j)
+                i_nbr_influence = get_nbr_influence(i, i_id_cursor)
+                ip_nbr_influence = get_nbr_influence(ip, ip_id_cursor)
                 if i_nbr_influence != ip_nbr_influence:
                     return (1 if i_nbr_influence > ip_nbr_influence else -1)
+            ip_cursor, i_cursor = new_ip_cursor, new_i_cursor
         # Handle the special case, that the radius of i/ip from all the
         # seeds is lesser than the radius of ip/i
         if (M_tilde_max[i] < M_tilde_min[ip]
@@ -136,6 +153,9 @@ if __name__ == '__main__':
     assert inflation_ranking(*test1()) == [
         22, 8, 29, 10, 25, 3, 24, 28, 6, 4, 17, 15, 7, 2, 19,
         13, 5, 14, 9, 12, 11, 0, 21, 16, 1, 26, 23, 20, 27, 18]
-    assert inflation_ranking(*test2()) == [1,3,0,2,4] # '(13/31)(0)(24/42)'
+    assert inflation_ranking(*test2()) in [[1,3,0,4,2],
+                                          [1,3,0,2,4],
+                                          [3,1, 0,2,4],
+                                          [3,1,0,4,2]]
     assert inflation_ranking(*test3()) == [1, 0]
-    print inflation_ranking(*test4())
+    assert inflation_ranking(*test4()) == [1, 0]
