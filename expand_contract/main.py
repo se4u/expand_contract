@@ -4,23 +4,23 @@
 | Description :
 | Author      : Pushpendre Rastogi
 | Created     : Wed Jan 11 19:08:18 2017 (-0500)
-| Last-Updated: Thu Jan 19 12:23:37 2017 (-0500)
+| Last-Updated: Sat Jan 21 00:56:39 2017 (-0500)
 |           By: Pushpendre Rastogi
-|     Update #: 122
+|     Update #: 127
 '''
 from distance_computer import l2distance
 from schedule import Schedule
 import numpy as np
 import contextlib
-import time
+import time, sys
 
 
 @contextlib.contextmanager
 def tictoc(msg):
     t = time.time()
-    print "Started", msg
+    print >> sys.stderr, "Started", msg
     yield
-    print "\nCompleted", msg, "in %0.1fs" % (time.time() - t)
+    print >> sys.stderr, "\nCompleted", msg, "in %0.1fs" % (time.time() - t)
 
 
 def arrange_by_index(M, I):
@@ -94,15 +94,18 @@ def inflation_ranking(sched, D, seed_labels):
     return ranking
 
 
-def test1(args):
-    point = np.random.rand(args.P, args.D)
-    seed = np.random.rand(args.S, args.D)
-    seed_labels = (np.rint(np.random.rand(args.S)) - 0.5)*2
+def test1():
+    import random
+    random.seed(0)
+    np.random.seed(0)
+    point = np.random.rand(30, 100)
+    seed = np.random.rand(1000, 100)
+    seed_labels = (np.rint(np.random.rand(1000)) - 0.5)*2
     D = l2distance(point, seed)
     sched = Schedule(auto_config=D, keep_all=True)
     return sched, D, seed_labels
 
-def test2(*args):
+def test2():
     sched = np.array([-1, 1, 5, 9])
     D = np.array([[1, 1,1,  1],
                   [5, 1,5,  9],
@@ -113,7 +116,7 @@ def test2(*args):
     return sched, D, seed_labels
 
 
-def test3(_args):
+def test3():
     seeds = np.array([[0, -1], [0, 1]], dtype = 'double')
     seed_labels = np.array([1, -1])
     pts = np.array([[0, 0], [2, 1]], dtype = 'double')
@@ -121,21 +124,18 @@ def test3(_args):
     sched = np.concatenate([[-1],sorted(set(D.flatten()))])
     return  sched, D, seed_labels
 
+def test4():
+    seeds = np.array([[-3, 2], [3, 2], [3, -2]], dtype = 'double')
+    seed_labels = np.array([-1, 1, 1])
+    pts = np.array([[-1, -3], [0, 1]], dtype = 'double')
+    D = l2distance(pts, seeds)
+    sched = np.concatenate([[-1],sorted(set(D.flatten()))])
+    return  sched, D, seed_labels
+
 if __name__ == '__main__':
-    import argparse
-    arg_parser = argparse.ArgumentParser(description='')
-    arg_parser.add_argument('--seed', default=0, type=int, help='Default={0}')
-    arg_parser.add_argument('--S', default=1000, type=int)
-    arg_parser.add_argument('--P', default=30, type=int)
-    arg_parser.add_argument('--D', default=100, type=int)
-    args=arg_parser.parse_args()
-    import random
-    random.seed(args.seed)
-    np.random.seed(args.seed)
-    ranking = inflation_ranking(*test1(args))
-    print 'Finished ranking points', ranking, \
-        'S=1000, P=30, [22, 8, 29, 10, 25, 3, 24, 28, 6, 4, 17, 15, 7, 2, 19, 13, 5, 14, 9, 12, 11, 0, 21, 16, 1, 26, 23, 20, 27, 18]'
-    ranking = inflation_ranking(*test2(args))
-    print 'Finished ranking points', ranking, '(13/31)(0)(24/42)'
-    ranking = inflation_ranking(*test3(args))
-    print 'Finished ranking points', ranking
+    assert inflation_ranking(*test1()) == [
+        22, 8, 29, 10, 25, 3, 24, 28, 6, 4, 17, 15, 7, 2, 19,
+        13, 5, 14, 9, 12, 11, 0, 21, 16, 1, 26, 23, 20, 27, 18]
+    assert inflation_ranking(*test2()) == [1,3,0,2,4] # '(13/31)(0)(24/42)'
+    assert inflation_ranking(*test3()) == [1, 0]
+    print inflation_ranking(*test4())
